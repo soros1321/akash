@@ -32,13 +32,13 @@ func AddFlagWait(cmd *cobra.Command, flags *pflag.FlagSet) {
 	flags.BoolP(constants.FlagWait, "w", false, "Wait for market confirmation")
 }
 
-func parseFlagKeyType(flags *pflag.FlagSet) (keys.CryptoAlgo, error) {
+func parseFlagKeyType(flags *pflag.FlagSet) (keys.SignAlgo, error) {
 	ktype, err := flags.GetString(constants.FlagKeyType)
 	if err != nil {
 		return "", err
 	}
 
-	switch keys.CryptoAlgo(ktype) {
+	switch keys.SignAlgo(ktype) {
 	case keys.AlgoEd25519:
 		return keys.AlgoEd25519, nil
 	case keys.AlgoSecp256k1:

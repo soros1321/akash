@@ -1,6 +1,6 @@
 package txutil
 
-import crypto "github.com/tendermint/go-crypto"
+import crypto "github.com/tendermint/tendermint/crypto"
 
 // Transaction signer
 type Signer interface {
@@ -12,7 +12,7 @@ type Signer interface {
 // an in-memory private key.
 type KeySigner interface {
 	PubKey() crypto.PubKey
-	Sign([]byte) crypto.Signature
+	Sign([]byte) (crypto.Signature, error)
 }
 
 type SignableTx interface {

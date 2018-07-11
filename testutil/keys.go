@@ -5,9 +5,9 @@ import (
 
 	"github.com/ovrclk/akash/txutil"
 	"github.com/stretchr/testify/require"
-	crypto "github.com/tendermint/go-crypto"
 	"github.com/tendermint/go-crypto/keys"
 	"github.com/tendermint/go-crypto/keys/words"
+	crypto "github.com/tendermint/tendermint/crypto"
 	tmdb "github.com/tendermint/tmlibs/db"
 )
 
@@ -39,7 +39,7 @@ func PrivateKeySigner(t *testing.T) (txutil.Signer, crypto.PrivKey) {
 
 func NewNamedKey(t *testing.T) (keys.Info, keys.Keybase) {
 	kmgr := KeyManager(t)
-	info, _, err := kmgr.Create(KeyName, KeyPasswd, KeyAlgo)
+	info, _, err := kmgr.CreateMnemonic(KeyName, KeyPasswd, KeyAlgo)
 	require.NoError(t, err)
 	return info, kmgr
 }

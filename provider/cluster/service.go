@@ -9,7 +9,7 @@ import (
 	lifecycle "github.com/boz/go-lifecycle"
 	"github.com/ovrclk/akash/provider/event"
 	"github.com/ovrclk/akash/types"
-	"github.com/tendermint/tmlibs/log"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 var ErrNotRunning = errors.New("not running")

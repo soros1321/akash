@@ -9,22 +9,40 @@ import:
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper
   version: master
+
+
 - package: github.com/tendermint/go-crypto
-  repo: https://github.com/ovrclk/go-crypto.git
 - package: github.com/tendermint/go-amino
-  repo: https://github.com/ovrclk/go-amino.git
+  # repo: https://github.com/ovrclk/go-amino.git
 - package: github.com/tendermint/iavl
-  repo: https://github.com/ovrclk/iavl.git
+  # repo: https://github.com/ovrclk/iavl.git
 - package: github.com/tendermint/abci
-  repo: https://github.com/ovrclk/abci.git
+  # repo: https://github.com/ovrclk/abci.git
 - package: github.com/tendermint/go-wire
-  repo: https://github.com/ovrclk/go-wire.git
+  # repo: https://github.com/ovrclk/go-wire.git
 - package: github.com/tendermint/tmlibs
-  version: ~0.8.2-rc0
-  repo: https://github.com/ovrclk/tmlibs.git
+  # version: ~0.8.2-rc0
+  # repo: https://github.com/ovrclk/tmlibs.git
 - package: github.com/tendermint/tendermint
-  version: develop
-  repo: https://github.com/ovrclk/tendermint.git
+  # version: develop
+
+# - package: github.com/tendermint/go-crypto
+#   repo: https://github.com/ovrclk/go-crypto.git
+# - package: github.com/tendermint/go-amino
+#   repo: https://github.com/ovrclk/go-amino.git
+# - package: github.com/tendermint/iavl
+#   repo: https://github.com/ovrclk/iavl.git
+# - package: github.com/tendermint/abci
+#   repo: https://github.com/ovrclk/abci.git
+# - package: github.com/tendermint/go-wire
+#   repo: https://github.com/ovrclk/go-wire.git
+# - package: github.com/tendermint/tmlibs
+#   version: ~0.8.2-rc0
+#   repo: https://github.com/ovrclk/tmlibs.git
+# - package: github.com/tendermint/tendermint
+#   version: develop
+#   repo: https://github.com/ovrclk/tendermint.git
+
 - package: github.com/stretchr/testify
   version: ^1.2.1
   subpackages:
@@ -47,7 +65,9 @@ import:
   subpackages:
   - '...'
 - package: k8s.io/apiextensions-apiserver
+  version: 'e8ab413e0ae1e19df66d60088a1e11c97b73fdd9'
 - package: k8s.io/apimachinery
+  version: '302974c03f7e50f16561ba237db776ab93594ef6'
   subpackages:
   - '...'
 - package: github.com/googleapis/gnostic

@@ -1,6 +1,9 @@
 package txutil
 
-import crypto "github.com/tendermint/go-crypto"
+import (
+	gocrypto "github.com/tendermint/go-crypto"
+	"github.com/tendermint/tendermint/crypto"
+)
 
 // Return a Signer backed by the given KeySigner (such as a crypto.PrivKey)
 func NewPrivateKeySigner(key KeySigner) Signer {
@@ -12,17 +15,23 @@ type privateKeySigner struct {
 }
 
 func (s privateKeySigner) Sign(tx SignableTx) error {
-	sig := s.key.Sign(tx.SignBytes())
+	sig, err := s.key.Sign(tx.SignBytes())
+	if err != nil {
+		return err
+	}
 	return tx.Sign(s.key.PubKey(), sig)
 }
 
 func (s privateKeySigner) SignBytes(bytes []byte) (crypto.Signature, crypto.PubKey, error) {
-	sig := s.key.Sign(bytes)
+	sig, err := s.key.Sign(bytes)
+	if err != nil {
+		return nil, nil, err
+	}
 	return sig, s.key.PubKey(), nil
 }
 
 type StoreSigner interface {
-	Sign(name, passphrase string, msg []byte) (crypto.Signature, crypto.PubKey, error)
+	Sign(name, passphrase string, msg []byte) (gocrypto.Signature, gocrypto.PubKey, error)
 }
 
 // Return a Signer backed by a keystore
@@ -45,5 +54,19 @@ func (s keyStoreSigner) Sign(tx SignableTx) error {
 }
 
 func (s keyStoreSigner) SignBytes(bytes []byte) (crypto.Signature, crypto.PubKey, error) {
-	return s.store.Sign(s.keyName, s.password, bytes)
+	gosig, gopub, err := s.store.Sign(s.keyName, s.password, bytes)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	sig, err := crypto.SignatureFromBytes(gosig.Bytes())
+	if err != nil {
+		return nil, nil, err
+	}
+
+	pub, err := crypto.PubKeyFromBytes(gopub.Bytes())
+	if err != nil {
+		return nil, nil, err
+	}
+	return sig, pub, nil
 }

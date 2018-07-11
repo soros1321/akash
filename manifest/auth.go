@@ -9,7 +9,7 @@ import (
 	"github.com/ovrclk/akash/provider/session"
 	"github.com/ovrclk/akash/txutil"
 	"github.com/ovrclk/akash/types"
-	crypto "github.com/tendermint/go-crypto"
+	crypto "github.com/tendermint/tendermint/crypto"
 )
 
 var (

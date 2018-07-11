@@ -9,10 +9,10 @@ import (
 
 	"github.com/ovrclk/akash/state"
 	"github.com/ovrclk/akash/util"
-	tmtypes "github.com/tendermint/abci/types"
+	abci_types "github.com/tendermint/tendermint/abci/types"
 	ctypes "github.com/tendermint/tendermint/consensus/types"
+	"github.com/tendermint/tendermint/libs/log"
 	tmtmtypes "github.com/tendermint/tendermint/types"
-	"github.com/tendermint/tmlibs/log"
 )
 
 const (
@@ -20,7 +20,7 @@ const (
 )
 
 type Driver interface {
-	OnBeginBlock(req tmtypes.RequestBeginBlock) error
+	OnBeginBlock(req abci_types.RequestBeginBlock) error
 	OnCommit(state state.State) error
 	Stop()
 }
@@ -32,7 +32,7 @@ type driver struct {
 	evch        chan interface{}
 	facilitator Facilitator
 
-	block *tmtypes.RequestBeginBlock
+	block *abci_types.RequestBeginBlock
 	rs    *ctypes.RoundState
 
 	bus *tmtmtypes.EventBus
@@ -78,7 +78,7 @@ func (d *driver) Stop() {
 	d.wg.Wait()
 }
 
-func (d *driver) OnBeginBlock(req tmtypes.RequestBeginBlock) error {
+func (d *driver) OnBeginBlock(req abci_types.RequestBeginBlock) error {
 	d.block = &req
 	return nil
 }

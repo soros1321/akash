@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	tmconfig "github.com/tendermint/tendermint/config"
-	"github.com/tendermint/tmlibs/log"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 const (
@@ -103,7 +103,7 @@ func (ctx *context) TMConfig() (*tmconfig.Config, error) {
 	}
 
 	cfg := tmconfig.DefaultConfig()
-	cfg.P2P.AuthEnc = false
+	// cfg.P2P.AuthEnc = false
 
 	if err := viper.Unmarshal(cfg); err != nil {
 		return nil, err

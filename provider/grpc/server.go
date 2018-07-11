@@ -11,7 +11,7 @@ import (
 	"github.com/ovrclk/akash/provider/cluster/kube"
 	"github.com/ovrclk/akash/provider/manifest"
 	"github.com/ovrclk/akash/types"
-	"github.com/tendermint/tmlibs/log"
+	"github.com/tendermint/tendermint/libs/log"
 	"golang.org/x/net/context"
 	"golang.org/x/net/netutil"
 	"google.golang.org/grpc"

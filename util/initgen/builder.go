@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/ovrclk/akash/types"
-	crypto "github.com/tendermint/go-crypto"
+	"github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/p2p"
+	"github.com/tendermint/tendermint/privval"
 	tmtypes "github.com/tendermint/tendermint/types"
-	privval "github.com/tendermint/tendermint/types/priv_validator"
 )
 
 const (

@@ -90,7 +90,7 @@ func (c *client) currentNonce() (uint64, error) {
 	if c.nonce != 0 {
 		return c.nonce, nil
 	}
-	path := query.AccountPath(c.key.Address())
+	path := query.AccountPath(c.key.GetPubKey().Address())
 	result, err := c.parent.ABCIQuery(path, nil)
 	if err != nil {
 		return 0, err

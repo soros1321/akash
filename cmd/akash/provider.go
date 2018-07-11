@@ -71,7 +71,7 @@ func doCreateProviderCommand(session session.Session, cmd *cobra.Command, args [
 			return err
 		}
 
-		info, _, err := kmgr.Create(kname, constants.Password, ktype)
+		info, _, err := kmgr.CreateMnemonic(kname, constants.Password, ktype)
 		if err != nil {
 			return err
 		}
@@ -81,7 +81,7 @@ func doCreateProviderCommand(session session.Session, cmd *cobra.Command, args [
 			return err
 		}
 
-		fmt.Printf("Key created: %v\n", X(info.Address()))
+		fmt.Printf("Key created: %v\n", X(info.GetPubKey().Address()))
 	}
 
 	txclient, err := session.TxClient()
@@ -101,7 +101,7 @@ func doCreateProviderCommand(session session.Session, cmd *cobra.Command, args [
 	}
 
 	result, err := txclient.BroadcastTxCommit(&types.TxCreateProvider{
-		Owner:      key.Address(),
+		Owner:      key.GetPubKey().Address().Bytes(),
 		HostURI:    prov.HostURI,
 		Attributes: prov.Attributes,
 		Nonce:      nonce,
@@ -145,9 +145,9 @@ func doProviderRunCommand(session session.Session, cmd *cobra.Command, args []st
 		return err
 	}
 
-	if !bytes.Equal(pobj.Owner, txclient.Key().Address()) {
+	if !bytes.Equal(pobj.Owner, txclient.Key().GetPubKey().Address()) {
 		return fmt.Errorf("invalid key for provider (owner: %v, key: %v)",
-			pobj.Owner.EncodeString(), X(txclient.Key().Address()))
+			pobj.Owner.EncodeString(), X(txclient.Key().GetPubKey().Address()))
 	}
 
 	var cclient cluster.Client

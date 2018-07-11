@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	tmtypes "github.com/tendermint/abci/types"
-	crypto "github.com/tendermint/go-crypto"
+	crypto "github.com/tendermint/tendermint/crypto"
 )
 
 func TestAcceptQuery(t *testing.T) {

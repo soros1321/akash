@@ -7,8 +7,8 @@ import (
 
 	"github.com/ovrclk/akash/types"
 	"github.com/tendermint/tendermint/p2p"
+	"github.com/tendermint/tendermint/privval"
 	tmtypes "github.com/tendermint/tendermint/types"
-	privval "github.com/tendermint/tendermint/types/priv_validator"
 )
 
 // Tendermint genesis doc from file

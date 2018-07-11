@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"github.com/tendermint/tmlibs/log"
+	"github.com/tendermint/tendermint/libs/log"
 	"golang.org/x/net/context"
 )
 

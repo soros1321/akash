@@ -11,7 +11,7 @@ import (
 	"github.com/ovrclk/akash/types"
 	"github.com/ovrclk/akash/types/base"
 	"github.com/stretchr/testify/assert"
-	crypto "github.com/tendermint/go-crypto"
+	crypto "github.com/tendermint/tendermint/crypto"
 )
 
 func RandUint32() uint32 {

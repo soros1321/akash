@@ -9,12 +9,12 @@ import (
 	"github.com/ovrclk/akash/node"
 	"github.com/ovrclk/akash/state"
 	"github.com/spf13/cobra"
+	cmn "github.com/tendermint/tendermint/libs/common"
+	"github.com/tendermint/tendermint/libs/log"
 	tmnode "github.com/tendermint/tendermint/node"
+	"github.com/tendermint/tendermint/privval"
 	"github.com/tendermint/tendermint/proxy"
 	tmtypes "github.com/tendermint/tendermint/types"
-	privval "github.com/tendermint/tendermint/types/priv_validator"
-	cmn "github.com/tendermint/tmlibs/common"
-	"github.com/tendermint/tmlibs/log"
 )
 
 const (
@@ -72,8 +72,9 @@ func doStartCommand(ctx Context, cmd *cobra.Command, args []string) error {
 	pvalidator := privval.LoadOrGenFilePV(cfg.PrivValidatorFile())
 	ccreator := proxy.NewLocalClientCreator(app)
 	dbprovider := tmnode.DefaultDBProvider
+	mprovider := tmnode.DefaultMetricsProvider
 
-	n, err := tmnode.NewNode(cfg, pvalidator, ccreator, gprovider, dbprovider, logger)
+	n, err := tmnode.NewNode(cfg, pvalidator, ccreator, gprovider, dbprovider, mprovider, logger)
 
 	if err != nil {
 		return err

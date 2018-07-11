@@ -10,7 +10,7 @@ import (
 	manifestclient "github.com/ovrclk/akash/pkg/client/clientset/versioned"
 	"github.com/ovrclk/akash/provider/cluster"
 	"github.com/ovrclk/akash/types"
-	"github.com/tendermint/tmlibs/log"
+	"github.com/tendermint/tendermint/libs/log"
 	corev1 "k8s.io/api/core/v1"
 	apiextcs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

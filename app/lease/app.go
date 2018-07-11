@@ -12,9 +12,9 @@ import (
 	appstate "github.com/ovrclk/akash/state"
 	"github.com/ovrclk/akash/types"
 	"github.com/ovrclk/akash/types/code"
-	tmtypes "github.com/tendermint/abci/types"
-	tmcommon "github.com/tendermint/tmlibs/common"
-	"github.com/tendermint/tmlibs/log"
+	abci_types "github.com/tendermint/tendermint/abci/types"
+	tmcommon "github.com/tendermint/tendermint/libs/common"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 const (
@@ -29,7 +29,7 @@ func NewApp(log log.Logger) (apptypes.Application, error) {
 	return &app{apptypes.NewBaseApp(Name, log)}, nil
 }
 
-func (a *app) AcceptQuery(req tmtypes.RequestQuery) bool {
+func (a *app) AcceptQuery(req abci_types.RequestQuery) bool {
 	return strings.HasPrefix(req.GetPath(), appstate.LeasePath)
 }
 
@@ -43,7 +43,7 @@ func (a *app) AcceptTx(ctx apptypes.Context, tx interface{}) bool {
 	return false
 }
 
-func (a *app) CheckTx(state appstate.State, ctx apptypes.Context, tx interface{}) tmtypes.ResponseCheckTx {
+func (a *app) CheckTx(state appstate.State, ctx apptypes.Context, tx interface{}) abci_types.ResponseCheckTx {
 	switch tx := tx.(type) {
 	case *types.TxPayload_TxCreateLease:
 		resp, _ := a.doCheckCreateTx(state, ctx, tx.TxCreateLease)
@@ -52,28 +52,28 @@ func (a *app) CheckTx(state appstate.State, ctx apptypes.Context, tx interface{}
 		resp, _ := a.doCheckCloseTx(state, ctx, tx.TxCloseLease)
 		return resp
 	}
-	return tmtypes.ResponseCheckTx{
+	return abci_types.ResponseCheckTx{
 		Code: code.UNKNOWN_TRANSACTION,
 		Log:  "unknown transaction",
 	}
 }
 
-func (a *app) DeliverTx(state appstate.State, ctx apptypes.Context, tx interface{}) tmtypes.ResponseDeliverTx {
+func (a *app) DeliverTx(state appstate.State, ctx apptypes.Context, tx interface{}) abci_types.ResponseDeliverTx {
 	switch tx := tx.(type) {
 	case *types.TxPayload_TxCreateLease:
 		return a.doDeliverCreateTx(state, ctx, tx.TxCreateLease)
 	case *types.TxPayload_TxCloseLease:
 		return a.doDeliverCloseTx(state, ctx, tx.TxCloseLease)
 	}
-	return tmtypes.ResponseDeliverTx{
+	return abci_types.ResponseDeliverTx{
 		Code: code.UNKNOWN_TRANSACTION,
 		Log:  "unknown transaction",
 	}
 }
 
-func (a *app) Query(state appstate.State, req tmtypes.RequestQuery) tmtypes.ResponseQuery {
+func (a *app) Query(state appstate.State, req abci_types.RequestQuery) abci_types.ResponseQuery {
 	if !a.AcceptQuery(req) {
-		return tmtypes.ResponseQuery{
+		return abci_types.ResponseQuery{
 			Code: code.UNKNOWN_QUERY,
 			Log:  "invalid key",
 		}
@@ -98,22 +98,22 @@ func (a *app) Query(state appstate.State, req tmtypes.RequestQuery) tmtypes.Resp
 		return a.doDeploymentQuery(state, key)
 	}
 
-	return tmtypes.ResponseQuery{
+	return abci_types.ResponseQuery{
 		Code: code.ERROR,
 		Log:  err.Error(),
 	}
 }
 
-func (a *app) doCheckCreateTx(state appstate.State, ctx apptypes.Context, tx *types.TxCreateLease) (tmtypes.ResponseCheckTx, *types.Order) {
+func (a *app) doCheckCreateTx(state appstate.State, ctx apptypes.Context, tx *types.TxCreateLease) (abci_types.ResponseCheckTx, *types.Order) {
 	if tx.Deployment == nil {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  "Empty deployment",
 		}, nil
 	}
 
 	if tx.Provider == nil {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  "Empty provider",
 		}, nil
@@ -122,13 +122,13 @@ func (a *app) doCheckCreateTx(state appstate.State, ctx apptypes.Context, tx *ty
 	// lookup provider
 	provider, err := state.Provider().Get(tx.Provider)
 	if err != nil {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}, nil
 	}
 	if provider == nil {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  "provider not found",
 		}, nil
@@ -137,13 +137,13 @@ func (a *app) doCheckCreateTx(state appstate.State, ctx apptypes.Context, tx *ty
 	// ensure provider account exists
 	acct, err := state.Account().Get(provider.Owner)
 	if err != nil {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}, nil
 	}
 	if acct == nil {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  "Provider account not found",
 		}, nil
@@ -152,13 +152,13 @@ func (a *app) doCheckCreateTx(state appstate.State, ctx apptypes.Context, tx *ty
 	// ensure order exists
 	order, err := state.Order().Get(tx.OrderID())
 	if err != nil {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}, nil
 	}
 	if order == nil {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  "order not found",
 		}, nil
@@ -166,7 +166,7 @@ func (a *app) doCheckCreateTx(state appstate.State, ctx apptypes.Context, tx *ty
 
 	// ensure order in correct state
 	if order.State != types.Order_OPEN {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  "order not open",
 		}, nil
@@ -175,19 +175,19 @@ func (a *app) doCheckCreateTx(state appstate.State, ctx apptypes.Context, tx *ty
 	// ensure fulfillment exists
 	fulfillment, err := state.Fulfillment().Get(tx.FulfillmentID())
 	if err != nil {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}, nil
 	}
 	if fulfillment == nil {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  "Fulfillment not found",
 		}, nil
 	}
 	if fulfillment.State != types.Fulfillment_OPEN {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  "Fulfillment not open",
 		}, nil
@@ -195,26 +195,26 @@ func (a *app) doCheckCreateTx(state appstate.State, ctx apptypes.Context, tx *ty
 
 	bestFulfillment, err := market.BestFulfillment(state, order)
 	if err != nil {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}, nil
 	}
 
 	if bestFulfillment.Compare(fulfillment) != 0 {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.ERROR,
 			Log:  "Unexpected fulfillment",
 		}, nil
 	}
 
-	return tmtypes.ResponseCheckTx{}, order
+	return abci_types.ResponseCheckTx{}, order
 }
 
-func (a *app) doDeliverCreateTx(state appstate.State, ctx apptypes.Context, tx *types.TxCreateLease) tmtypes.ResponseDeliverTx {
+func (a *app) doDeliverCreateTx(state appstate.State, ctx apptypes.Context, tx *types.TxCreateLease) abci_types.ResponseDeliverTx {
 	cresp, matchedOrder := a.doCheckCreateTx(state, ctx, tx)
 	if !cresp.IsOK() {
-		return tmtypes.ResponseDeliverTx{
+		return abci_types.ResponseDeliverTx{
 			Code: cresp.Code,
 			Log:  cresp.Log,
 		}
@@ -227,7 +227,7 @@ func (a *app) doDeliverCreateTx(state appstate.State, ctx apptypes.Context, tx *
 	}
 
 	if err := state.Lease().Save(lease); err != nil {
-		return tmtypes.ResponseDeliverTx{
+		return abci_types.ResponseDeliverTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  err.Error(),
 		}
@@ -235,13 +235,13 @@ func (a *app) doDeliverCreateTx(state appstate.State, ctx apptypes.Context, tx *
 
 	group, err := state.DeploymentGroup().Get(tx.GroupID())
 	if err != nil {
-		return tmtypes.ResponseDeliverTx{
+		return abci_types.ResponseDeliverTx{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}
 	}
 	if group == nil {
-		return tmtypes.ResponseDeliverTx{
+		return abci_types.ResponseDeliverTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  "group not found",
 		}
@@ -249,13 +249,13 @@ func (a *app) doDeliverCreateTx(state appstate.State, ctx apptypes.Context, tx *
 
 	orders, err := state.Order().ForGroup(group.DeploymentGroupID)
 	if err != nil {
-		return tmtypes.ResponseDeliverTx{
+		return abci_types.ResponseDeliverTx{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}
 	}
 	if orders == nil {
-		return tmtypes.ResponseDeliverTx{
+		return abci_types.ResponseDeliverTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  "orders not found",
 		}
@@ -268,7 +268,7 @@ func (a *app) doDeliverCreateTx(state appstate.State, ctx apptypes.Context, tx *
 			order.State = types.Order_MATCHED
 		}
 		if err := state.Order().Save(order); err != nil {
-			return tmtypes.ResponseDeliverTx{
+			return abci_types.ResponseDeliverTx{
 				Code: code.INVALID_TRANSACTION,
 				Log:  err.Error(),
 			}
@@ -279,42 +279,42 @@ func (a *app) doDeliverCreateTx(state appstate.State, ctx apptypes.Context, tx *
 	tags = append(tags, tmcommon.KVPair{Key: []byte(apptypes.TagNameDeployment), Value: lease.Deployment})
 	tags = append(tags, tmcommon.KVPair{Key: []byte(apptypes.TagNameLease), Value: keys.LeaseID(lease.LeaseID).Bytes()})
 
-	return tmtypes.ResponseDeliverTx{
+	return abci_types.ResponseDeliverTx{
 		Tags: tags,
 	}
 }
 
-func (a *app) doCheckCloseTx(state appstate.State, ctx apptypes.Context, tx *types.TxCloseLease) (tmtypes.ResponseCheckTx, *types.Lease) {
+func (a *app) doCheckCloseTx(state appstate.State, ctx apptypes.Context, tx *types.TxCloseLease) (abci_types.ResponseCheckTx, *types.Lease) {
 
 	// lookup provider
 	lease, err := state.Lease().Get(tx.LeaseID)
 	if err != nil {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}, nil
 	}
 	if lease == nil {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  "lease not found",
 		}, nil
 	}
 
 	if lease.State != types.Lease_ACTIVE {
-		return tmtypes.ResponseCheckTx{
+		return abci_types.ResponseCheckTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  "lease not active",
 		}, nil
 	}
 
-	return tmtypes.ResponseCheckTx{}, lease
+	return abci_types.ResponseCheckTx{}, lease
 }
 
-func (a *app) doDeliverCloseTx(state appstate.State, ctx apptypes.Context, tx *types.TxCloseLease) tmtypes.ResponseDeliverTx {
+func (a *app) doDeliverCloseTx(state appstate.State, ctx apptypes.Context, tx *types.TxCloseLease) abci_types.ResponseDeliverTx {
 	cresp, lease := a.doCheckCloseTx(state, ctx, tx)
 	if !cresp.IsOK() {
-		return tmtypes.ResponseDeliverTx{
+		return abci_types.ResponseDeliverTx{
 			Code: cresp.Code,
 			Log:  cresp.Log,
 		}
@@ -322,13 +322,13 @@ func (a *app) doDeliverCloseTx(state appstate.State, ctx apptypes.Context, tx *t
 
 	group, err := state.DeploymentGroup().Get(lease.GroupID())
 	if err != nil {
-		return tmtypes.ResponseDeliverTx{
+		return abci_types.ResponseDeliverTx{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}
 	}
 	if group == nil {
-		return tmtypes.ResponseDeliverTx{
+		return abci_types.ResponseDeliverTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  "group not found",
 		}
@@ -336,13 +336,13 @@ func (a *app) doDeliverCloseTx(state appstate.State, ctx apptypes.Context, tx *t
 
 	order, err := state.Order().Get(lease.OrderID())
 	if err != nil {
-		return tmtypes.ResponseDeliverTx{
+		return abci_types.ResponseDeliverTx{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}
 	}
 	if order == nil {
-		return tmtypes.ResponseDeliverTx{
+		return abci_types.ResponseDeliverTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  "order not found",
 		}
@@ -350,7 +350,7 @@ func (a *app) doDeliverCloseTx(state appstate.State, ctx apptypes.Context, tx *t
 
 	order.State = types.Order_CLOSED
 	if err := state.Order().Save(order); err != nil {
-		return tmtypes.ResponseDeliverTx{
+		return abci_types.ResponseDeliverTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  err.Error(),
 		}
@@ -358,7 +358,7 @@ func (a *app) doDeliverCloseTx(state appstate.State, ctx apptypes.Context, tx *t
 
 	group.State = types.DeploymentGroup_OPEN
 	if err := state.DeploymentGroup().Save(group); err != nil {
-		return tmtypes.ResponseDeliverTx{
+		return abci_types.ResponseDeliverTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  err.Error(),
 		}
@@ -366,7 +366,7 @@ func (a *app) doDeliverCloseTx(state appstate.State, ctx apptypes.Context, tx *t
 
 	lease.State = types.Lease_CLOSED
 	if err := state.Lease().Save(lease); err != nil {
-		return tmtypes.ResponseDeliverTx{
+		return abci_types.ResponseDeliverTx{
 			Code: code.INVALID_TRANSACTION,
 			Log:  err.Error(),
 		}
@@ -375,23 +375,23 @@ func (a *app) doDeliverCloseTx(state appstate.State, ctx apptypes.Context, tx *t
 	tags := apptypes.NewTags(a.Name(), apptypes.TxTypeCloseLease)
 	tags = append(tags, tmcommon.KVPair{Key: []byte(apptypes.TagNameLease), Value: keys.LeaseID(lease.LeaseID).Bytes()})
 
-	return tmtypes.ResponseDeliverTx{
+	return abci_types.ResponseDeliverTx{
 		Tags: tags,
 	}
 }
 
-func (a *app) doQuery(state appstate.State, key keys.Lease) tmtypes.ResponseQuery {
+func (a *app) doQuery(state appstate.State, key keys.Lease) abci_types.ResponseQuery {
 	lease, err := state.Lease().Get(key.ID())
 
 	if err != nil {
-		return tmtypes.ResponseQuery{
+		return abci_types.ResponseQuery{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}
 	}
 
 	if lease == nil {
-		return tmtypes.ResponseQuery{
+		return abci_types.ResponseQuery{
 			Code: code.NOT_FOUND,
 			Log:  fmt.Sprintf("lease %v not found", key.Path()),
 		}
@@ -399,22 +399,22 @@ func (a *app) doQuery(state appstate.State, key keys.Lease) tmtypes.ResponseQuer
 
 	bytes, err := proto.Marshal(lease)
 	if err != nil {
-		return tmtypes.ResponseQuery{
+		return abci_types.ResponseQuery{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}
 	}
 
-	return tmtypes.ResponseQuery{
+	return abci_types.ResponseQuery{
 		Value:  bytes,
 		Height: state.Version(),
 	}
 }
 
-func (a *app) doRangeQuery(state appstate.State) tmtypes.ResponseQuery {
+func (a *app) doRangeQuery(state appstate.State) abci_types.ResponseQuery {
 	items, err := state.Lease().All()
 	if err != nil {
-		return tmtypes.ResponseQuery{
+		return abci_types.ResponseQuery{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}
@@ -424,22 +424,22 @@ func (a *app) doRangeQuery(state appstate.State) tmtypes.ResponseQuery {
 
 	bytes, err := proto.Marshal(coll)
 	if err != nil {
-		return tmtypes.ResponseQuery{
+		return abci_types.ResponseQuery{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}
 	}
 
-	return tmtypes.ResponseQuery{
+	return abci_types.ResponseQuery{
 		Value:  bytes,
 		Height: state.Version(),
 	}
 }
 
-func (a *app) doDeploymentQuery(state appstate.State, key keys.Deployment) tmtypes.ResponseQuery {
+func (a *app) doDeploymentQuery(state appstate.State, key keys.Deployment) abci_types.ResponseQuery {
 	items, err := state.Lease().ForDeployment(key.Bytes())
 	if err != nil {
-		return tmtypes.ResponseQuery{
+		return abci_types.ResponseQuery{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}
@@ -449,13 +449,13 @@ func (a *app) doDeploymentQuery(state appstate.State, key keys.Deployment) tmtyp
 
 	bytes, err := proto.Marshal(coll)
 	if err != nil {
-		return tmtypes.ResponseQuery{
+		return abci_types.ResponseQuery{
 			Code: code.ERROR,
 			Log:  err.Error(),
 		}
 	}
 
-	return tmtypes.ResponseQuery{
+	return abci_types.ResponseQuery{
 		Value:  bytes,
 		Height: state.Version(),
 	}

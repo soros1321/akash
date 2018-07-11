@@ -5,7 +5,7 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	"github.com/ovrclk/akash/types"
-	crypto "github.com/tendermint/go-crypto"
+	crypto "github.com/tendermint/tendermint/crypto"
 )
 
 type TxBuilder interface {
