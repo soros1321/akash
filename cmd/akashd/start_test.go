@@ -24,6 +24,7 @@ func Test_Start_Fail(t *testing.T) {
 }
 
 func Test_Start(t *testing.T) {
+	// t.Skip("WTF")
 	testutil.WithTempDir(t, func(basedir string) {
 		// init genesis data
 		genesispath := basedir + "/config/genesis.json"

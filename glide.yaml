@@ -13,18 +13,11 @@ import:
 
 - package: github.com/tendermint/go-crypto
 - package: github.com/tendermint/go-amino
-  # repo: https://github.com/ovrclk/go-amino.git
 - package: github.com/tendermint/iavl
-  # repo: https://github.com/ovrclk/iavl.git
-- package: github.com/tendermint/abci
-  # repo: https://github.com/ovrclk/abci.git
 - package: github.com/tendermint/go-wire
-  # repo: https://github.com/ovrclk/go-wire.git
 - package: github.com/tendermint/tmlibs
-  # version: ~0.8.2-rc0
-  # repo: https://github.com/ovrclk/tmlibs.git
 - package: github.com/tendermint/tendermint
-  # version: develop
+  version: develop
 
 # - package: github.com/tendermint/go-crypto
 #   repo: https://github.com/ovrclk/go-crypto.git

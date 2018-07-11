@@ -1,5 +1,5 @@
-hash: 6dfae8c52f391108d2748f8cda4e83236325b2401511b5b8ff11c499dea13464
-updated: 2018-07-11T02:42:10.977077427-07:00
+hash: 449ae13621adaed71f53b289baa7d345fa9a799d545e66f1c2745deedd9a5676
+updated: 2018-07-11T03:23:34.626925203-07:00
 imports:
 - name: github.com/beorn7/perks
   version: 3ac7bf7a47d159a033b107610db8a1b6575507a4
@@ -191,12 +191,6 @@ imports:
   - leveldb/storage
   - leveldb/table
   - leveldb/util
-- name: github.com/tendermint/abci
-  version: 7857efac3cf65bfc528b4fac0bc42fe9e6564dd7
-  subpackages:
-  - example/code
-  - example/counter
-  - types
 - name: github.com/tendermint/ed25519
   version: d8387025d2b9d158cf4efb07e7ebf814bcce2057
   subpackages:
@@ -217,10 +211,11 @@ imports:
 - name: github.com/tendermint/iavl
   version: 35f66e53d9b01e83b30de68b931f54b2477a94c9
 - name: github.com/tendermint/tendermint
-  version: 2aa2b63cadc42cca1071c36adfd2f2ce14e1aa8f
+  version: f9ae7730fe7a90d4a084aa022d0f5f72fcb3388c
   subpackages:
   - abci/client
   - abci/example/code
+  - abci/example/counter
   - abci/example/kvstore
   - abci/types
   - blockchain
