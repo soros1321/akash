@@ -63,7 +63,7 @@ func TestFlag_Nonce(t *testing.T) {
 		kmgr, err := sess.KeyManager()
 		require.NoError(t, err)
 
-		_, _, err = kmgr.Create(key, constants.Password, keys.AlgoEd25519)
+		_, _, err = kmgr.CreateMnemonic(key, constants.Password, keys.AlgoEd25519)
 		require.NoError(t, err)
 
 		nonce, err := sess.Nonce()

@@ -88,7 +88,7 @@ func TestVerifySig_InvalidSig(t *testing.T) {
 func TestVerifyDeploymentTennant(t *testing.T) {
 	info, kmgr := testutil.NewNamedKey(t)
 	signer := testutil.Signer(t, kmgr)
-	tenant := info.Address()
+	tenant := info.GetPubKey().Address().Bytes()
 	deployment := testutil.Deployment(tenant, 1)
 	providerID := testutil.Address(t)
 	provider := testutil.Provider(providerID, 4)
@@ -100,14 +100,14 @@ func TestVerifyDeploymentTennant(t *testing.T) {
 	mani := &types.Manifest{}
 	mreq, _, err := SignManifest(mani, signer, deployment.Address)
 	require.NoError(t, err)
-	err = verifyDeploymentTennant(mreq, sess, info.Address())
+	err = verifyDeploymentTennant(mreq, sess, info.GetPubKey().Address().Bytes())
 	assert.NoError(t, err)
 }
 
 func TestVerifyDeploymentTennant_InvalidKey(t *testing.T) {
 	info, kmgr := testutil.NewNamedKey(t)
 	signer := testutil.Signer(t, kmgr)
-	tenant := info.Address()
+	tenant := info.GetPubKey().Address().Bytes()
 	deployment := testutil.Deployment(tenant, 1)
 	providerID := testutil.Address(t)
 	provider := testutil.Provider(providerID, 4)
@@ -119,14 +119,14 @@ func TestVerifyDeploymentTennant_InvalidKey(t *testing.T) {
 	mani := &types.Manifest{}
 	mreq, _, err := SignManifest(mani, signer, deployment.Address)
 	require.NoError(t, err)
-	err = verifyDeploymentTennant(mreq, sess, info.Address())
+	err = verifyDeploymentTennant(mreq, sess, info.GetPubKey().Address().Bytes())
 	assert.NoError(t, err)
 }
 
 func TestVerifyRequest(t *testing.T) {
 	info, kmgr := testutil.NewNamedKey(t)
 	signer := testutil.Signer(t, kmgr)
-	tenant := info.Address()
+	tenant := info.GetPubKey().Address().Bytes()
 	mani := &types.Manifest{}
 	version, err := Hash(mani)
 	require.NoError(t, err)

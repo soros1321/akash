@@ -9,7 +9,7 @@ import (
 	"github.com/ovrclk/akash/testutil"
 	"github.com/stretchr/testify/require"
 
-	"github.com/tendermint/abci/types"
+	"github.com/tendermint/tendermint/abci/types"
 	ctypes "github.com/tendermint/tendermint/consensus/types"
 	tmtmtypes "github.com/tendermint/tendermint/types"
 )

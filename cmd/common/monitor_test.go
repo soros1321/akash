@@ -7,7 +7,7 @@ import (
 	"github.com/ovrclk/akash/marketplace"
 	"github.com/ovrclk/akash/testutil"
 	"github.com/stretchr/testify/require"
-	"github.com/tendermint/abci/example/counter"
+	"github.com/tendermint/tendermint/abci/example/counter"
 	"github.com/tendermint/tendermint/node"
 	"github.com/tendermint/tendermint/rpc/client"
 	rpctest "github.com/tendermint/tendermint/rpc/test"
